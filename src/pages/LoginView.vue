@@ -1,10 +1,17 @@
 <template>
-    <div class="row">
-        <div class="eight columns">
-            <div class="small-header">Let's get started</div>
+    <div class="section hero">
+        <div class="row">
+            <div class="one-half column">
+            <h4 class="hero-heading">Turn Speeches into Actionable Insights: Informed Decisions Made Easy</h4>
             <div id="logged_out_view">
-                <button @click="login" type="button">Login</button>
-                <button @click="register" type="button">Register</button>
+                    <button @click="login" type="button" class="button button-primary">Login</button>
+                    <button @click="register" type="button" class="button button-primary">Register</button>
+                </div>
+            </div>
+            <div class="one-half column">
+                <div class="hero-image-container">
+                    <img class="hero-image" src="../assets/slick.jpg"/>
+                </div>
             </div>
         </div>
     </div>
@@ -22,3 +29,8 @@ export default {
     }
 }
 </script>
+<style scoped>
+button {
+    margin-right: 0.5em;
+}
+</style>
