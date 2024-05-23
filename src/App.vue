@@ -15,7 +15,7 @@
   </div>
 </template>
 <script>
-
+import {getToken} from '@/util'
 export default {
   data() {
     return {
@@ -24,14 +24,16 @@ export default {
   },
   methods: {
     async logout() {
-      await this.$auth.logout();
+      this.$api.logout();
+      this.canLogout = false;
+      this.$router.push({ path: '/' });
     }
   },
   async mounted() {
-    // const isAuthenticated = await this.$auth.isAuthenticated();
-    // if(isAuthenticated) {
-    //     this.canLogout = true;
-    // }
+    const isAuthenticated = getToken();
+    if(isAuthenticated) {
+        this.canLogout = true;
+    }
   }
 }
 </script>

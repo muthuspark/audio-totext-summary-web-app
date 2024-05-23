@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import RecorderComponent from './components/RecorderComponent.vue';
 import SummariesView from './pages/SummariesView.vue';
 import LoginView from './pages/LoginView.vue';
+import { getToken } from './util';
 
 
 const ROUTE = {
@@ -44,5 +45,15 @@ export default class RouterInstance {
         });
 
         this.router = router;
+
+        this.router.beforeEach((to, from, next) => {
+            const isAuthenticated = getToken();
+            console.log(from.name);
+            if(isAuthenticated && to.name === 'Login') {
+                next({ name: 'Home' })
+            }
+            else if (to.name !== 'Login' && !isAuthenticated) next({ name: 'Login' })
+            else next()
+        })
     }
 }

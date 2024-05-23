@@ -12,7 +12,6 @@ export const API = {
 class Api {
   constructor() {
     this.authToken = null;
-    this.userId = null;
   }
 
   /**
@@ -116,6 +115,11 @@ class Api {
         method: 'POST',
         body: formData
     })
+  }
+
+  logout() {
+    this.authToken = null;
+    localStorage.removeItem('token');
   }
 }
 
