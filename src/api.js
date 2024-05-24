@@ -1,15 +1,17 @@
 import { getToken } from './util';
 
-export const API = {
-  GET_SUMMARIES: "http://localhost:8008/get_summaries",
-  GET_SUMMARY: "http://localhost:8008/get_summary",
-  REMOVE_SUMMARY: "http://localhost:8008/remove_summary",
-  UPDATE_TITLE: "http://localhost:8008/update_title",
-  SUMMARIZING_COMPLETED: "http://localhost:8008/summarizing_completed",
-  UPLOAD : "http://localhost:8008/upload"
-}
 
 class Api {
+
+  static routes = {
+    GET_SUMMARIES: "http://localhost:8008/get_summaries",
+    GET_SUMMARY: "http://localhost:8008/get_summary",
+    REMOVE_SUMMARY: "http://localhost:8008/remove_summary",
+    UPDATE_TITLE: "http://localhost:8008/update_title",
+    SUMMARIZING_COMPLETED: "http://localhost:8008/summarizing_completed",
+    UPLOAD: "http://localhost:8008/upload"
+  }
+
   constructor() {
     this.authToken = null;
   }
@@ -22,7 +24,7 @@ class Api {
    */
   async createRequestOptions(body) {
 
-    if(!this.authToken) {
+    if (!this.authToken) {
       this.authToken = getToken();
     }
 
@@ -42,7 +44,7 @@ class Api {
   async getSummaries() {
     try {
       const payload = await this.createRequestOptions();
-      const response = await fetch(API.GET_SUMMARIES, payload);
+      const response = await fetch(Api.routes.GET_SUMMARIES, payload);
       const data = await response.json();
       console.log(data);
       return data;
@@ -54,7 +56,7 @@ class Api {
 
   async getSummaryById(_id) {
     const payload = await this.createRequestOptions({ "id": _id });
-    const response = await fetch(API.GET_SUMMARY, payload);
+    const response = await fetch(Api.routes.GET_SUMMARY, payload);
 
     // Check if response status is 404
     if (!response.ok) {
@@ -62,59 +64,69 @@ class Api {
       // Handle 404 error
       throw new Error(data.message);
     }
-
-    const data = await response.json();
-    console.log(data);
-    return data;
+    return await response.json();
   }
 
   async removeSummary(audio_file_name) {
-    try {
-      const payload = await this.createRequestOptions({
-        "audio_file_name": audio_file_name
-      });
-      const response = await fetch(API.REMOVE_SUMMARY, payload);
+    const payload = await this.createRequestOptions({
+      "audio_file_name": audio_file_name
+    });
+    const response = await fetch(Api.routes.REMOVE_SUMMARY, payload);
+    // Check if response status is 404
+    if (!response.ok) {
       const data = await response.json();
-      console.log(data);
-      return data;
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
+      // Handle 404 error
+      throw new Error(data.message);
     }
+    return await response.json();
   }
 
   async updateRecordingName(recordingName, audioFileName) {
-    try {
-      const payload = await this.createRequestOptions({
-        "audio_file_name": audioFileName,
-        "recording_name": recordingName
-      });
-      const response = await fetch(API.UPDATE_TITLE, payload);
+    const payload = await this.createRequestOptions({
+      "audio_file_name": audioFileName,
+      "recording_name": recordingName
+    });
+    const response = await fetch(Api.routes.UPDATE_TITLE, payload);
+    // Check if response status is 404
+    if (!response.ok) {
       const data = await response.json();
-      console.log(data);
-      return data;
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
+      // Handle 404 error
+      throw new Error(data.message);
     }
+    return await response.json();
   }
 
   async checkSummarizationStatus(data) {
-    try {
       const payload = await this.createRequestOptions(data);
-      const response = await fetch(API.SUMMARIZING_COMPLETED, payload);
-      return response;
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
-    }
+      const response = await fetch(Api.routes.SUMMARIZING_COMPLETED, payload);
+      // Check if response status is 404
+      if (!response.ok) {
+        const data = await response.json();
+        // Handle 404 error
+        throw new Error(data.message);
+      }
+      return await response.json();
   }
 
-  async fileUpload(formData) {
-    return await fetch('/upload', {
-        method: 'POST',
-        body: formData
-    })
+  /**
+   * Upload a file to the server using a FormData object
+   *
+   * @param {FormData} formData - a FormData object containing the file to upload
+   * @return {Promise} - a promise that resolves with the response from the server
+   */
+  async uploadFile(formData) {
+    const response = await fetch(Api.routes.UPLOAD, {
+      method: 'POST',
+      body: formData
+    });
+
+    // Check if response status is 404
+    if (!response.ok) {
+      const data = await response.json();
+      // Handle 404 error
+      throw new Error(data.message);
+    }
+    return await response.json();
   }
 
   logout() {
