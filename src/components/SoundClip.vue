@@ -1,8 +1,8 @@
 <template>
     <div class="clip" :id="data.name">
         <div class="row">
-            <div class="eight columns">{{ decodeURI(data.name) }}</div>
-            <div class="four columns summarizing">Summarizing.. <progress v-if="summarizing" /></div>
+            <div class="six columns">{{ decodeURI(data.name) }}</div>
+            <div class="six columns summarizing" v-if="summarizing">Summarizing...</div>
         </div>
         <div class="row">
             <div class="twelve columns">
@@ -31,39 +31,39 @@ export default {
         WaveSurfer
     },
     methods: {
-        checkIfSummaryCompleted(recordingName) {
+        async checkIfSummaryCompleted(recordingName) {
             this.summarizing = true;
-            const app = this;
-            const clrInterval = setInterval(function () {
-                // TODO: This should be a websocket
-                app.$api.checkIfSummaryCompleted({
+            try {
+                await this.$api.checkSummarizationStatus({
                     "recording_name": recordingName
-                }).then(response => {
-                    if (response.ok) {
-                        clearInterval(clrInterval);
-                        app.summarizing = false;
-                        app.emitter.emit('reload-soundclips');
-                        app.remove();
-                    }
-                })
-                    .catch(error => {
-                        console.error('Error uploading audio:', error);
-                    });
-            }, 5000);
+                });
+                this.summarizing = false;
+                this.emitter.emit('reload-soundclips');
+                this.remove();
+            } catch(e){
+                // ignore this
+            }
         },
         remove() {
             document.getElementById(this.data.name).remove();
         },
-        async summarize() {
+        async uploadAudio() {
+            if (!this.data || !this.data.blob || !this.data.name) {
+                console.error("uploadAudio() called with null pointer references");
+                return;
+            }
             const formData = new FormData();
             formData.append('audio', this.data.blob, `${this.data.name}.webm`);
             formData.append('name', this.data.name);
-            await this.$api.fileUpload(formData)
-            this.checkIfSummaryCompleted(this.data.name);
+            try {
+                await this.$api.uploadFile(formData);
+            } catch (error) {
+                console.error("uploadAudio() caught exception:", error);
+            }
         }
     },
-    mounted() {
-        this.summarize()
+    async mounted() {
+        await this.uploadAudio()
     }
 }
 </script>

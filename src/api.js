@@ -16,6 +16,18 @@ class Api {
     this.authToken = null;
   }
 
+  getHeaders() {
+    if (!this.authToken) {
+      this.authToken = getToken();
+    }
+
+
+    return {
+      'Content-Type': 'application/json', // Set the content type header
+      Authorization: `Bearer ${this.authToken}` // Add the authorization header
+    }
+  }
+
   /**
    * Creates a payload object for a POST request.
    *
@@ -24,16 +36,10 @@ class Api {
    */
   async createRequestOptions(body) {
 
-    if (!this.authToken) {
-      this.authToken = getToken();
-    }
 
     const options = {
       method: 'POST', // Specify the method as POST
-      headers: {
-        'Content-Type': 'application/json', // Set the content type header
-        Authorization: `Bearer ${this.authToken}` // Add the authorization header
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify(body || {}) // Add the JSON data to the body
     };
 
@@ -97,15 +103,15 @@ class Api {
   }
 
   async checkSummarizationStatus(data) {
-      const payload = await this.createRequestOptions(data);
-      const response = await fetch(Api.routes.SUMMARIZING_COMPLETED, payload);
-      // Check if response status is 404
-      if (!response.ok) {
-        const data = await response.json();
-        // Handle 404 error
-        throw new Error(data.message);
-      }
-      return await response.json();
+    const payload = await this.createRequestOptions(data);
+    const response = await fetch(Api.routes.SUMMARIZING_COMPLETED, payload);
+    // Check if response status is 404
+    if (!response.ok) {
+      const data = await response.json();
+      // Handle 404 error
+      throw new Error(data.message);
+    }
+    return await response.json();
   }
 
   /**
@@ -115,9 +121,15 @@ class Api {
    * @return {Promise} - a promise that resolves with the response from the server
    */
   async uploadFile(formData) {
+
+    const headers = {
+      Authorization: `Bearer ${getToken()}` // Add the authorization header
+    }
+
     const response = await fetch(Api.routes.UPLOAD, {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers: headers
     });
 
     // Check if response status is 404

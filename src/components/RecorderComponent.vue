@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="docs-section">
-      <h5 v-if="title">
-        <input type="text" v-model="title" maxlength="100" class="title-input">
+      <h5>
+        <input type="text" v-model="title" maxlength="100" placeholder="Recording title" class="title-input">
       </h5>
       <article>
         <header>

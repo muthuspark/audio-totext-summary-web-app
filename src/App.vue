@@ -3,7 +3,7 @@
     <nav class="navbar">
       <div class="container">
         <ul class="navbar-list">
-          <li class="navbar-item"><a class="navbar-link" href="#"><strong>Speech Synopsis</strong></a></li>
+          <li class="navbar-item"><a class="navbar-link" href="/"><strong>Speech Synopsis</strong></a></li>
           <li v-if="canLogout" class="navbar-item nav-bar-right"><a class="navbar-link" @click="logout">Logout</a></li>
         </ul>
       </div>
